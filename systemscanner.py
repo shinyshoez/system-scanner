@@ -15,6 +15,7 @@ import importlib
 import csv
 import re
 import warnings
+from urllib3.exceptions import NotOpenSSLWarning
 
 
 # -------------------
@@ -26,7 +27,7 @@ import warnings
 WINDOWS_MODULES = ["psutil", "requests", "getmac"]
 LINUX_MODULES = ["psutil", "requests"]
 MACOS_MODULES = ["psutil", "requests"]
-DOWNLOAD_URL = "https://speed.hetzner.de/100MB.bin"
+DOWNLOAD_URL = "https://github.com/Mherstik/Automation_Sem2_2025/raw/refs/heads/main/50MB.zip"
 
 try:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

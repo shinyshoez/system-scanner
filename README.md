@@ -55,6 +55,16 @@ Results are saved to `scan_results.csv` with the following columns:
 | Internet Connection Speed | Download speed in Mb/s |
 | Active Ports | Active TCP ports separated by semicolons |
 
+## Changing the download URL
+
+The download speed test uses a default file hosted on GitHub. You can change it by editing the `DOWNLOAD_URL` constant at the top of `systemscanner.py`:
+
+```python
+DOWNLOAD_URL = "https://your-preferred-url-here"
+```
+
+For best results, use a server geographically close to you.
+
 ## Notes
 
 - On macOS, run with `sudo` to allow active port scanning:
