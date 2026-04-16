@@ -20,7 +20,7 @@ Results are saved to `scan_results.csv` in the same folder. If the same computer
 ## Requirements
 
 - Python 3
-- Windows or Linux
+- Windows, Linux, or macOS
 - Internet connection (for download speed test)
 
 The script will automatically install any missing Python modules:
@@ -57,7 +57,10 @@ Results are saved to `scan_results.csv` with the following columns:
 
 ## Notes
 
-- macOS is not currently supported
+- On macOS, run with `sudo` to allow active port scanning:
+  ```bash
+  sudo python3 systemscanner.py
+  ```
 - The script requires permission to read network connections for port scanning
 
 ## Author

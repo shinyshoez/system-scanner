@@ -14,6 +14,8 @@ import datetime
 import importlib
 import csv
 import re
+import warnings
+
 
 # -------------------
 # Constants and setup
@@ -23,6 +25,7 @@ import re
 # the directory where the script is located, and the CSV file for storing scan results.
 WINDOWS_MODULES = ["psutil", "requests", "getmac"]
 LINUX_MODULES = ["psutil", "requests"]
+MACOS_MODULES = ["psutil", "requests"]
 DOWNLOAD_URL = "https://github.com/Mherstik/Automation_Sem2_2025/raw/refs/heads/main/50MB.zip"
 
 try:
@@ -128,6 +131,15 @@ def getLinuxMac():
     except Exception as e:
         print(f"[getLinuxMac] Failed to retrieve MAC address: {e}")
         return "N/A"
+    
+def getMacOsMAC():
+    # Returns the MAC address on MacOS
+    try:
+        mac = ':'.join(re.findall('..', '%012x' % uuid.getnode()))
+        return mac
+    except Exception as e:
+        print(f"[getMacOsMac] Failed to retrieve MAC address: {e}")
+        return "N/A"
 
 def getActivePorts():
     # Retrieves all local TCP ports with active (ESTABLISHED) connections.
@@ -222,6 +234,26 @@ def getLinuxOs():
     except Exception as e:
         print(f"[getLinuxOs] Failed to get Linux OS version: {e}")
         return "Linux Unknown"
+
+def getMacOsProcessor():
+    # Returns the processor model for a MacOs system.
+    try:
+        result = subprocess.check_output(["sysctl", "-n",
+                                          "machdep.cpu.brand_string"])
+        return result.decode().strip()
+    except Exception as e:
+        print(f"[getMacOsProcessor] Failed to get processor: {e}")
+    return platform.machine() or "Unknown"
+
+def getMacOsVersion():
+    # Returns the Os Version for a MacOs system. 
+    try:
+        release = platform.mac_ver()[0]
+        return f"macOS {release}"
+    except Exception as e:
+        print(f"[getMacOsVersion] Failed to get macOS version: {e}")
+        return "macOS Unknown"
+
 
 # -----------------------------
 # Sanitise function
@@ -334,6 +366,31 @@ def linuxBranch():
 
     updateOrAppendCsv(row)
 
+# ------------------------
+# MacOs system scan branch
+# ------------------------
+# This function performs a system scan on a MacOS computer.
+# It installs any missing MacOS modules, performs all system checks,
+# and saves the results to the CSV file.
+def macOsBranch():
+    # Suppress urllib3 SSL warning on macOS due to LibreSSL incompatibility
+    warnings.filterwarnings("ignore", category=NotOpenSSLWarning)                
+    print("Running macOS system scan...") 
+    for m in MACOS_MODULES:
+        installAndImport(m)
+    row = [
+        performCheck("Computer Name", getComputerName),
+        performCheck("Local IP", getLocalIp),
+        performCheck("MAC Address", getMacOsMAC),
+        performCheck("Processor", getMacOsProcessor),
+        performCheck("Operating System", getMacOsVersion),
+        performCheck("System Time", getSystemTime),
+        performCheck("Download Speed", getDownloadSpeed),
+        performCheck("Active Ports", getActivePorts) 
+    ]   
+
+    updateOrAppendCsv(row)
+
 # -------------
 # Main function
 # -------------
@@ -348,6 +405,8 @@ def main():
         windowsBranch()
     elif system == "Linux":
         linuxBranch()
+    elif system == "Darwin":
+        macOsBranch()
     else:
         print(f"Unsupported platform: {system}")
         sys.exit(1)
